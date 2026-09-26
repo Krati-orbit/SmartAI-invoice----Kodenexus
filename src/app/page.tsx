@@ -2,24 +2,19 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
-import { NavigationTabs, AppTab } from '@/components/NavigationTabs';
+import { SideNavigationDrawer, ActiveModal } from '@/components/SideNavigationDrawer';
 import { PromptInputPanel } from '@/components/PromptInputPanel';
 import { InvoiceReviewPanel } from '@/components/InvoiceReviewPanel';
-import { InvoiceHistoryView } from '@/components/InvoiceHistoryView';
-import { CatalogView } from '@/components/CatalogView';
-import { CompanyProfileView } from '@/components/CompanyProfileView';
+import { HistoryModal } from '@/components/HistoryModal';
 import { CatalogModal } from '@/components/CatalogModal';
+import { CompanyModal } from '@/components/CompanyModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { AddItemModal } from '@/components/AddItemModal';
 import { WorkflowGuide } from '@/components/WorkflowGuide';
 import { InvoiceData, InvoiceItem, SenderInfo } from '@/types/invoice';
 import { SAMPLE_PRESETS } from '@/data/presets';
 import { CATALOG, CatalogItem } from '@/data/catalog';
-import {
-  ShieldCheck,
-  Zap,
-  Database
-} from 'lucide-react';
+import { ShieldCheck, Zap, Database } from 'lucide-react';
 
 const INITIAL_SENDER: SenderInfo = {
   name: 'Finance & Accounts',
@@ -199,7 +194,6 @@ const INITIAL_HISTORY: InvoiceData[] = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<AppTab>('generator');
   const [promptText, setPromptText] = useState(SAMPLE_PRESETS[0].prompt);
   const [invoice, setInvoice] = useState<InvoiceData>(INITIAL_INVOICE);
   const [senderProfile, setSenderProfile] = useState<SenderInfo>(INITIAL_SENDER);
@@ -213,12 +207,17 @@ export default function Home() {
   const [matchedCount, setMatchedCount] = useState<number>(4);
   const [unmatchedCount, setUnmatchedCount] = useState<number>(0);
 
-  // Settings & Modals state
-  const [apiKey, setApiKey] = useState('');
-  const [provider, setProvider] = useState<'gemini' | 'groq' | 'smart'>('smart');
+  // Side Drawer & Pop-up Modals State
+  const [isSideDrawerOpen, setIsSideDrawerOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isCompanyOpen, setIsCompanyOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+
+  // Settings
+  const [apiKey, setApiKey] = useState('');
+  const [provider, setProvider] = useState<'gemini' | 'groq' | 'smart'>('smart');
 
   // Load saved settings & history from localStorage on client
   useEffect(() => {
@@ -326,7 +325,7 @@ export default function Home() {
     }));
   };
 
-  // Select service from Catalog
+  // Select service from Catalog modal
   const handleSelectServiceFromCatalog = (service: CatalogItem) => {
     const newItem: InvoiceItem = {
       id: `item-${Date.now()}`,
@@ -340,13 +339,11 @@ export default function Home() {
       matchConfidence: 1.0
     };
     handleAddItem(newItem);
-    setActiveTab('generator');
   };
 
   // Select an invoice from history to load into editor
   const handleSelectHistoryInvoice = (selected: InvoiceData) => {
     setInvoice(selected);
-    setActiveTab('generator');
   };
 
   // Delete invoice from history
@@ -355,117 +352,120 @@ export default function Home() {
     saveHistoryToStorage(updated);
   };
 
+  // Handle opening sub-view from side drawer
+  const handleOpenFromDrawer = (view: ActiveModal) => {
+    if (view === 'history') setIsHistoryOpen(true);
+    else if (view === 'catalog') setIsCatalogOpen(true);
+    else if (view === 'company') setIsCompanyOpen(true);
+    else if (view === 'settings') setIsSettingsOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
       {/* Top Header */}
       <Header
+        onOpenSideDrawer={() => setIsSideDrawerOpen(true)}
         onOpenCatalog={() => setIsCatalogOpen(true)}
+        onOpenHistory={() => setIsHistoryOpen(true)}
+        onOpenCompany={() => setIsCompanyOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         activeProvider={provider === 'smart' ? 'Built-in NLP' : provider}
+        historyCount={historyInvoices.length}
       />
 
-      {/* Navigation Tabs (SaaS Multi-view) */}
-      <NavigationTabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
+      {/* Hero Stats Ribbon */}
+      <div className="border-b border-slate-900 bg-slate-950/60 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="font-semibold text-slate-300">Live AI Engine Active:</span>
+            <span className="text-slate-400">
+              Transforming unstructured requests into review-ready invoices
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 sm:gap-6 text-slate-400">
+            <div className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Anti-Hallucination: <strong className="text-emerald-400">100%</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Database className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Catalog: <strong className="text-indigo-400">{CATALOG.length} Services</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <span>Avg Latency: <strong className="text-amber-400">~150ms</strong></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3-Step Guided Workflow Banner */}
+      <WorkflowGuide />
+
+      {/* Main Dual-Panel Workspace (Always Visible & Central) */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Natural Language Input & Presets (5 cols on lg) */}
+          <div className="lg:col-span-5 h-[calc(100vh-175px)] min-h-[580px] sticky top-20">
+            <PromptInputPanel
+              promptText={promptText}
+              setPromptText={setPromptText}
+              onExtract={handleExtract}
+              isLoading={isLoading}
+              steps={steps}
+              durationMs={durationMs}
+              matchedCount={matchedCount}
+              unmatchedCount={unmatchedCount}
+            />
+          </div>
+
+          {/* Right Column: Human-in-the-Loop Review & Live Invoice Document (7 cols on lg) */}
+          <div className="lg:col-span-7 h-[calc(100vh-175px)] min-h-[580px]">
+            <InvoiceReviewPanel
+              invoice={invoice}
+              setInvoice={setInvoice}
+              onOpenAddItem={() => setIsAddItemOpen(true)}
+            />
+          </div>
+        </div>
+      </main>
+
+      {/* Side Slide-Over Navigation Drawer Popup */}
+      <SideNavigationDrawer
+        isOpen={isSideDrawerOpen}
+        onClose={() => setIsSideDrawerOpen(false)}
+        onOpenView={handleOpenFromDrawer}
         historyCount={historyInvoices.length}
         catalogCount={CATALOG.length}
       />
 
-      {/* Dynamic Views Based on Active Tab */}
-      {activeTab === 'generator' && (
-        <>
-          {/* Hero Stats Ribbon */}
-          <div className="border-b border-slate-900 bg-slate-950/60 backdrop-blur-md">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
-                <span className="font-semibold text-slate-300">Live AI Engine Active:</span>
-                <span className="text-slate-400">
-                  Transforming unstructured requests into review-ready invoices
-                </span>
-              </div>
+      {/* History Popup Window */}
+      <HistoryModal
+        isOpen={isHistoryOpen}
+        onClose={() => setIsHistoryOpen(false)}
+        invoices={historyInvoices}
+        onSelectInvoice={handleSelectHistoryInvoice}
+        onDeleteInvoice={handleDeleteHistoryInvoice}
+      />
 
-              <div className="flex items-center gap-4 sm:gap-6 text-slate-400">
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Anti-Hallucination: <strong className="text-emerald-400">100%</strong></span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Database className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Catalog: <strong className="text-indigo-400">{CATALOG.length} Services</strong></span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Avg Latency: <strong className="text-amber-400">~150ms</strong></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 3-Step Guided Workflow Banner */}
-          <WorkflowGuide />
-
-          {/* Main Dual-Panel Workspace */}
-          <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: Natural Language Input & Presets (5 cols on lg) */}
-              <div className="lg:col-span-5 h-[calc(100vh-210px)] min-h-[580px] sticky top-28">
-                <PromptInputPanel
-                  promptText={promptText}
-                  setPromptText={setPromptText}
-                  onExtract={handleExtract}
-                  isLoading={isLoading}
-                  steps={steps}
-                  durationMs={durationMs}
-                  matchedCount={matchedCount}
-                  unmatchedCount={unmatchedCount}
-                />
-              </div>
-
-              {/* Right Column: Human-in-the-Loop Review & Live Invoice Document (7 cols on lg) */}
-              <div className="lg:col-span-7 h-[calc(100vh-210px)] min-h-[580px]">
-                <InvoiceReviewPanel
-                  invoice={invoice}
-                  setInvoice={setInvoice}
-                  onOpenAddItem={() => setIsAddItemOpen(true)}
-                />
-              </div>
-            </div>
-          </main>
-        </>
-      )}
-
-      {activeTab === 'history' && (
-        <main className="flex-1">
-          <InvoiceHistoryView
-            invoices={historyInvoices}
-            onSelectInvoice={handleSelectHistoryInvoice}
-            onDeleteInvoice={handleDeleteHistoryInvoice}
-            onCreateNew={() => setActiveTab('generator')}
-          />
-        </main>
-      )}
-
-      {activeTab === 'catalog' && (
-        <main className="flex-1">
-          <CatalogView onSelectServiceToInvoice={handleSelectServiceFromCatalog} />
-        </main>
-      )}
-
-      {activeTab === 'company' && (
-        <main className="flex-1">
-          <CompanyProfileView sender={senderProfile} onUpdateSender={handleUpdateSender} />
-        </main>
-      )}
-
-      {/* Global Modals */}
+      {/* Pricing Catalog Popup Window */}
       <CatalogModal
         isOpen={isCatalogOpen}
         onClose={() => setIsCatalogOpen(false)}
         onSelectService={handleSelectServiceFromCatalog}
       />
 
+      {/* Company Profile & Settlement Routing Popup Window */}
+      <CompanyModal
+        isOpen={isCompanyOpen}
+        onClose={() => setIsCompanyOpen(false)}
+        sender={senderProfile}
+        onUpdateSender={handleUpdateSender}
+      />
+
+      {/* AI Engine Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
@@ -474,6 +474,7 @@ export default function Home() {
         onSave={handleSaveSettings}
       />
 
+      {/* Add Item Modal */}
       <AddItemModal
         isOpen={isAddItemOpen}
         onClose={() => setIsAddItemOpen(false)}
