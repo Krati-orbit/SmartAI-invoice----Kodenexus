@@ -219,6 +219,14 @@ export default function Home() {
   const [apiKey, setApiKey] = useState('');
   const [provider, setProvider] = useState<'gemini' | 'groq' | 'smart'>('smart');
 
+  // Success Toast notification
+  const [showSuccessToast, setShowSuccessToast] = useState<{
+    invoiceNumber: string;
+    matched: number;
+    unmatched: number;
+    client: string;
+  } | null>(null);
+
   // Load saved settings & history from localStorage on client
   useEffect(() => {
     try {
@@ -290,7 +298,9 @@ export default function Home() {
 
       const newInvoice: InvoiceData = {
         ...data.invoice,
-        sender: senderProfile
+        sender: data.invoice.sender?.company && data.invoice.sender.company !== 'Kodnexus Technologies Pvt. Ltd.'
+          ? data.invoice.sender
+          : senderProfile
       };
 
       setInvoice(newInvoice);
@@ -298,6 +308,21 @@ export default function Home() {
       setDurationMs(data.durationMs || 120);
       setMatchedCount(data.matchedCount || 0);
       setUnmatchedCount(data.unmatchedCount || 0);
+
+      // Trigger visual success notification
+      setShowSuccessToast({
+        invoiceNumber: newInvoice.invoiceNumber,
+        matched: data.matchedCount || 0,
+        unmatched: data.unmatchedCount || 0,
+        client: newInvoice.client.name
+      });
+      setTimeout(() => setShowSuccessToast(null), 4500);
+
+      // Smoothly scroll to invoice on smaller screens
+      const docEl = document.getElementById('invoice-paper-document');
+      if (docEl && window.innerWidth < 1024) {
+        docEl.scrollIntoView({ behavior: 'smooth' });
+      }
 
       // Prepend to history
       const existingIdx = historyInvoices.findIndex(h => h.invoiceNumber === newInvoice.invoiceNumber);
@@ -403,6 +428,39 @@ export default function Home() {
 
       {/* 3-Step Guided Workflow Banner */}
       <WorkflowGuide />
+
+      {/* Floating Success Toast */}
+      {showSuccessToast && (
+        <div className="fixed top-20 right-4 sm:right-8 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-900 border border-emerald-500/60 shadow-2xl shadow-emerald-500/25 text-white max-w-sm sm:max-w-md">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-500/30">
+              ✓
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-xs font-bold text-white flex items-center gap-2">
+                <span>Invoice Generated!</span>
+                <span className="font-mono text-emerald-400 font-semibold">{showSuccessToast.invoiceNumber}</span>
+              </div>
+              <p className="text-[11px] text-slate-300 truncate mt-0.5">
+                Billed to: <strong>{showSuccessToast.client}</strong>
+              </p>
+              <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-1">
+                <span className="text-emerald-400 font-medium">✓ {showSuccessToast.matched} matched</span>
+                {showSuccessToast.unmatched > 0 && (
+                  <span className="text-amber-400 font-medium">⚠ {showSuccessToast.unmatched} custom</span>
+                )}
+                <span>• Live document updated</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowSuccessToast(null)}
+              className="text-slate-400 hover:text-white p-1 text-xs cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Dual-Panel Workspace (Always Visible & Central) */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
