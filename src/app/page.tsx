@@ -21,6 +21,8 @@ import {
   Cpu
 } from 'lucide-react';
 
+import { WorkflowGuide } from '@/components/WorkflowGuide';
+
 const INITIAL_INVOICE: InvoiceData = {
   invoiceNumber: 'INV-2026-4821',
   issueDate: new Date().toISOString().split('T')[0],
@@ -231,6 +233,9 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* 3-Step Guided Workflow Banner */}
+      <WorkflowGuide />
 
       {/* Main Dual-Panel Workspace */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">

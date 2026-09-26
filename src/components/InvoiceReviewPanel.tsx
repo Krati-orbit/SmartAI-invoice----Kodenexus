@@ -127,16 +127,16 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
     <div className="flex flex-col h-full bg-slate-900/60 border border-slate-800/80 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md">
       {/* Top Action & Verification Bar */}
       <div className="p-4 border-b border-slate-800/80 bg-slate-950/70 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 rounded-lg bg-emerald-600/20 text-emerald-400 items-center justify-center text-xs font-bold border border-emerald-500/30">
-            2
+        <div className="flex items-center gap-2.5">
+          <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold uppercase tracking-wider">
+            Step 3 of 3
           </span>
           <div>
             <h2 className="text-sm font-bold text-white flex items-center gap-2">
-              Human-in-the-Loop Review & Generator
+              Human-in-the-Loop Review & PDF Export
             </h2>
             <p className="text-[11px] text-slate-400">
-              Interactive review: adjust prices, quantities, taxes, and resolve missing services.
+              Live document preview: adjust line items, change taxes, or download finalized PDF.
             </p>
           </div>
         </div>
