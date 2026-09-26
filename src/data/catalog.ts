@@ -14,7 +14,11 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'Full-stack Web App Module',
     unit_price_inr: 45000,
     description: 'Development of a production-ready web application module with frontend and backend integration.',
-    aliases: ['web app', 'fullstack web', 'full stack web app', 'web application module', 'web platform', 'full-stack website']
+    aliases: [
+      'web app', 'fullstack web', 'full stack web app', 'web application module',
+      'full stack web application modules', 'web application modules', 'full stack web application',
+      'web platform', 'full-stack website'
+    ]
   },
   {
     service_id: 'SRV002',
@@ -22,7 +26,10 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'REST API Development',
     unit_price_inr: 18000,
     description: 'Design and development of RESTful APIs with authentication and database integration.',
-    aliases: ['api development', 'rest api', 'backend api', 'api endpoints', 'restful api', 'api integration module']
+    aliases: [
+      'api development', 'rest api', 'backend api', 'api endpoints', 'restful api',
+      'api work', 'backend integration', 'api work backend integration', 'api integration module', 'api work / backend integration'
+    ]
   },
   {
     service_id: 'SRV003',
@@ -30,7 +37,7 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'Mobile App Module',
     unit_price_inr: 35000,
     description: 'Development of a cross-platform mobile application module with API integration.',
-    aliases: ['mobile app', 'flutter app', 'react native app', 'ios app', 'android app', 'cross-platform mobile module']
+    aliases: ['mobile app', 'flutter app', 'react native app', 'ios app', 'android app', 'cross-platform mobile module', 'mobile app modules']
   },
   {
     service_id: 'SRV004',
@@ -38,7 +45,7 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'Database Design & Setup',
     unit_price_inr: 15000,
     description: 'Database schema design, relationships, indexing, and initial configuration.',
-    aliases: ['database design', 'db setup', 'schema design', 'sql setup', 'postgres setup', 'mongodb database setup']
+    aliases: ['database design', 'db setup', 'schema design', 'sql setup', 'postgres setup', 'mongodb database setup', 'database setup']
   },
   {
     service_id: 'SRV005',
@@ -46,7 +53,10 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'UI/UX Wireframing',
     unit_price_inr: 8000,
     description: 'Creation of low-fidelity wireframes and user flows for a digital product.',
-    aliases: ['wireframing', 'wireframes', 'ux wireframing', 'low fidelity wireframes', 'user flows']
+    aliases: [
+      'wireframing', 'wireframes', 'ux wireframing', 'low fidelity wireframes', 'user flows',
+      'wireframe sets', 'wireframe set', 'wireframes for the new customer dashboard', 'dashboard wireframes'
+    ]
   },
   {
     service_id: 'SRV006',
@@ -54,7 +64,7 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'UI/UX Design Package',
     unit_price_inr: 25000,
     description: 'Complete high-fidelity interface design for web or mobile screens.',
-    aliases: ['ui ux design', 'figma design', 'ui design package', 'high fidelity design', 'interface design', 'app mockup']
+    aliases: ['ui ux design', 'figma design', 'ui design package', 'high fidelity design', 'interface design', 'app mockup', 'ui/ux design']
   },
   {
     service_id: 'SRV007',
@@ -70,7 +80,10 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'Cloud Setup & Deployment',
     unit_price_inr: 22000,
     description: 'Initial cloud infrastructure setup, application deployment, and environment configuration.',
-    aliases: ['cloud setup', 'aws deployment', 'cloud deployment', 'devops setup', 'server configuration', 'infrastructure setup']
+    aliases: [
+      'cloud setup', 'aws deployment', 'cloud deployment', 'devops setup', 'server configuration', 'infrastructure setup',
+      'cloud deployment and initial server setup', 'initial server setup', 'server setup'
+    ]
   },
   {
     service_id: 'SRV009',
@@ -86,7 +99,10 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'IT Consulting',
     unit_price_inr: 12000,
     description: 'Technical consultation covering architecture, technology selection, and implementation strategy.',
-    aliases: ['it consulting', 'tech consultation', 'it advisory', 'tech review meeting', 'technical consulting']
+    aliases: [
+      'it consulting', 'tech consultation', 'it advisory', 'tech review meeting', 'technical consulting',
+      'technical consultation', 'consultation sessions', 'technical consultation - 2 sessions', 'technical consultation sessions'
+    ]
   },
   {
     service_id: 'SRV011',
@@ -102,7 +118,7 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'Digital Marketing Campaign',
     unit_price_inr: 30000,
     description: 'Planning and execution support for a digital marketing campaign across selected channels.',
-    aliases: ['digital marketing', 'marketing campaign', 'social media campaign', 'ad campaign', 'performance marketing']
+    aliases: ['digital marketing', 'marketing campaign', 'social media campaign', 'ad campaign', 'performance marketing', 'marketing campaigns']
   },
   {
     service_id: 'SRV013',
@@ -110,7 +126,7 @@ export const CATALOG: CatalogItem[] = [
     service_name: 'SEO Optimization Package',
     unit_price_inr: 16000,
     description: 'On-page SEO improvements, technical SEO checks, and keyword optimization.',
-    aliases: ['seo', 'seo optimization', 'search engine optimization', 'on-page seo', 'technical seo']
+    aliases: ['seo', 'seo optimization', 'search engine optimization', 'on-page seo', 'technical seo', 'seo optimization package']
   },
   {
     service_id: 'SRV014',

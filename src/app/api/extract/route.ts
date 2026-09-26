@@ -9,90 +9,221 @@ function parseWithRuleEngine(prompt: string): {
   companyName: string;
   address: string;
   phone: string;
+  invoiceNumber?: string;
+  issueDate?: string;
+  senderName?: string;
+  senderCompany?: string;
+  senderEmail?: string;
+  senderAddress?: string;
   items: Array<{ title: string; quantity: number; notes?: string }>;
   taxRate: number;
   notes: string;
+  terms: string;
 } {
   // Extract email
-  const emailMatch = prompt.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-  const clientEmail = emailMatch ? emailMatch[0] : 'client@example.com';
+  const emailMatches = prompt.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g);
+  let clientEmail = 'client@example.com';
+  let senderEmail = 'billing@technovate.example';
+
+  if (emailMatches && emailMatches.length > 0) {
+    if (emailMatches.length === 1) {
+      clientEmail = emailMatches[0];
+    } else {
+      senderEmail = emailMatches[0];
+      clientEmail = emailMatches[1] || emailMatches[0];
+    }
+  }
 
   // Extract phone
   const phoneMatch = prompt.match(/(?:\+?\d{1,3}[ -]?)?\(?\d{3}\)?[ -]?\d{3}[ -]?\d{4}|\+91[\s\d]{10,12}/);
   const phone = phoneMatch ? phoneMatch[0].trim() : '';
 
-  // Extract tax
+  // Extract tax rate
   let taxRate = 18; // default standard GST
-  const taxMatch = prompt.match(/(\d+)%\s*(?:gst|tax|vat)/i);
-  if (taxMatch && taxMatch[1]) {
-    taxRate = parseInt(taxMatch[1], 10);
+  const taxMatch = prompt.match(/(?:gst|tax|vat)\s*(?:\(?\s*(\d+)%\s*\)?|:\s*(\d+)%)/i) || prompt.match(/(\d+)%\s*(?:gst|tax|vat)/i);
+  if (taxMatch) {
+    const rateVal = taxMatch[1] || taxMatch[2];
+    if (rateVal) taxRate = parseInt(rateVal, 10);
   }
 
-  // Extract client name
+  // Extract Invoice Number (e.g., "Invoice No: INV-2026-0917")
+  const invNumMatch = prompt.match(/Invoice\s*(?:No\.?|Number|#)\s*:?\s*([A-Za-z0-9-_]+)/i) ||
+                      prompt.match(/\b(INV-[A-Za-z0-9-_]+)\b/i);
+  let invoiceNumber = '';
+  if (invNumMatch && invNumMatch[1] && invNumMatch[1].toLowerCase() !== 'invoice') {
+    invoiceNumber = invNumMatch[1];
+  }
+
+  // Extract Date
+  const dateMatch = prompt.match(/Date:\s*([0-9]{1,2}\s+[A-Za-z]+\s+[0-9]{4}|[0-9]{4}-[0-9]{2}-[0-9]{2}|[^\n]+)/i);
+  let issueDate = '';
+  if (dateMatch && dateMatch[1]) {
+    const rawDate = dateMatch[1].trim();
+    if (!rawDate.toLowerCase().includes('invoice') && rawDate.length < 25) {
+      issueDate = rawDate;
+    }
+  }
+
+  // Extract Bill To & Client Details
   let clientName = 'Valued Client';
-  const namePatterns = [
-    /(?:This is|I am|from)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:from|at|\(|,|\.)/i,
-    /(?:Thanks|Regards|Best regards|Cheerio),\s*\n*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-    /(?:Client details:?\s*\n*)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
-    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+here from/i
-  ];
-  for (const pattern of namePatterns) {
-    const match = prompt.match(pattern);
-    if (match && match[1] && !['Good', 'Hello', 'Hi', 'Please', 'We'].includes(match[1].trim())) {
-      clientName = match[1].trim();
-      break;
-    }
-  }
-
-  // Extract company
   let companyName = '';
-  const companyPatterns = [
-    /(?:from|at)\s+([A-Z][A-Za-z0-9\s&]+?)(?:\s*\(|\s*,|\s*\.|\s+here|\s+Labs|\s+Retail|\s+Organics|\s+Dynamics|\s+Corp|\s+LLC|\s+Inc)/,
-    /(?:addressed to|bill to)\s+([A-Z][A-Za-z0-9\s&]+?)(?:,|\.|\n)/i
-  ];
-  for (const pattern of companyPatterns) {
-    const match = prompt.match(pattern);
-    if (match && match[1] && match[1].length < 40) {
-      companyName = match[1].trim();
-      break;
+  let address = '';
+
+  const billToMatch = prompt.match(/Bill\s*To:?\s*\n+([^\n]+)(?:\n+([^\n]+))?/i);
+  if (billToMatch) {
+    clientName = billToMatch[1].trim();
+    companyName = billToMatch[1].trim();
+    if (billToMatch[2] && !billToMatch[2].toLowerCase().includes('hey') && !billToMatch[2].toLowerCase().includes('thanks')) {
+      address = billToMatch[2].trim();
+    }
+  } else {
+    const namePatterns = [
+      /(?:This is|I am|from)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:from|at|\(|,|\.)/i,
+      /(?:Thanks|Regards|Best regards|Cheerio),\s*\n*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+      /(?:Client details:?\s*\n*)([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i,
+      /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+here from/i
+    ];
+    for (const pattern of namePatterns) {
+      const match = prompt.match(pattern);
+      if (match && match[1] && !['Good', 'Hello', 'Hi', 'Please', 'We'].includes(match[1].trim())) {
+        clientName = match[1].trim();
+        break;
+      }
+    }
+
+    const companyPatterns = [
+      /(?:from|at)\s+([A-Z][A-Za-z0-9\s&]+?)(?:\s*\(|\s*,|\s*\.|\s+here|\s+Labs|\s+Retail|\s+Organics|\s+Dynamics|\s+Corp|\s+LLC|\s+Inc)/,
+      /(?:addressed to|bill to)\s+([A-Z][A-Za-z0-9\s&]+?)(?:,|\.|\n)/i
+    ];
+    for (const pattern of companyPatterns) {
+      const match = prompt.match(pattern);
+      if (match && match[1] && match[1].length < 40) {
+        companyName = match[1].trim();
+        break;
+      }
+    }
+
+    const addressMatch = prompt.match(/(?:Address:?|addressed\s+to:?|Bill\s+to:?)\s*([^\n]+?(?:,\s*[^\n]+?){1,3})(?:\.|\n|$)/i);
+    if (addressMatch && addressMatch[1]) {
+      address = addressMatch[1].replace(/^(?:ed\s+to|to)\s+/i, '').trim();
     }
   }
 
-  // Extract Address
-  let address = '';
-  const addressMatch = prompt.match(/(?:Address:?|addressed to|Bill to)\s*[:\s]*([^\n]+(?:,\s*[^\n]+){1,3})/i);
-  if (addressMatch && addressMatch[1]) {
-    address = addressMatch[1].trim();
+  // Extract Sender Organization (e.g., TECHNOVATE SOLUTIONS, Agra)
+  let senderCompany = 'Kodnexus Technologies Pvt. Ltd.';
+  let senderAddress = 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103';
+
+  const headerSenderMatch = prompt.match(/^\s*([A-Z\s]{4,35})\n+\s*([^\n]+)\n+\s*([^\n]+)/);
+  if (headerSenderMatch && headerSenderMatch[1]) {
+    const rawSender = headerSenderMatch[1].trim();
+    if (!['INVOICE', 'BILL TO', 'HEY TEAM'].includes(rawSender.toUpperCase())) {
+      senderCompany = rawSender
+        .split(' ')
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+        .join(' ');
+      if (headerSenderMatch[3] && !headerSenderMatch[3].includes('Email:')) {
+        senderAddress = `${headerSenderMatch[2].trim()}, ${headerSenderMatch[3].trim()}`;
+      } else if (headerSenderMatch[2]) {
+        senderAddress = headerSenderMatch[2].trim();
+      }
+    }
   }
 
-  // Extract Line Items
+  // Pre-process and normalize lines for line item extraction
+  const rawLines = prompt.split('\n');
+  const normalizedLines: string[] = [];
+  let pendingLine = '';
+
+  for (let i = 0; i < rawLines.length; i++) {
+    const trimmed = rawLines[i].trim();
+    if (!trimmed) {
+      if (pendingLine) {
+        normalizedLines.push(pendingLine);
+        pendingLine = '';
+      }
+      continue;
+    }
+
+    // STRICT: Filter out pure divider/decorative lines or lines without any alphabetic letters
+    if (!/[a-zA-Z]/.test(trimmed)) continue;
+    if (/^[-=_*.#~+]{2,}$/.test(trimmed)) continue;
+    if (/^[-=_*.#~\s]+$/.test(trimmed)) continue;
+
+    // Join wrapped lines with dot leaders or trailing price
+    if (trimmed.includes('...') || /\.{2,}\s*[\d,]+/.test(trimmed)) {
+      if (pendingLine) {
+        normalizedLines.push(`${pendingLine} ${trimmed}`);
+        pendingLine = '';
+      } else {
+        normalizedLines.push(trimmed);
+      }
+    } else {
+      if (pendingLine) {
+        normalizedLines.push(pendingLine);
+      }
+      pendingLine = trimmed;
+    }
+  }
+  if (pendingLine) normalizedLines.push(pendingLine);
+
   const items: Array<{ title: string; quantity: number; notes?: string }> = [];
-  const lines = prompt.split('\n');
 
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
+  for (const line of normalizedLines) {
+    const lower = line.toLowerCase();
 
-    // Pattern 1: Numbered or bullet list like "1. 2 REST API Development" or "- 1 Brand Identity Design"
-    const listPattern = /^(?:[-*•]|\d+[\.\)])\s*(\d+)?\s*(?:x\s*)?([A-Za-z0-9\s/&-]+?)(?:\s*\((.*?)\)|\s*for\s*(.*?)|$)/i;
-    const match = trimmed.match(listPattern);
+    // Ignore non-item lines, headers, footers, totals, greetings
+    if (
+      lower.startsWith('subtotal') ||
+      lower.startsWith('total') ||
+      lower.startsWith('gst') ||
+      lower.startsWith('tax') ||
+      lower.startsWith('invoice') ||
+      lower.startsWith('date:') ||
+      lower.startsWith('bill to') ||
+      lower.startsWith('payment terms') ||
+      lower.startsWith('bank transfer') ||
+      lower.startsWith('thank you') ||
+      lower.startsWith('thanks') ||
+      lower.startsWith('hey') ||
+      lower.startsWith('hi team') ||
+      lower.startsWith('this is') ||
+      lower.startsWith('below are the') ||
+      lower.startsWith('here is what') ||
+      lower.startsWith('software & digital') ||
+      lower.startsWith('email:') ||
+      lower.startsWith('phone:') ||
+      lower.startsWith('tel:') ||
+      lower.startsWith('provided during') ||
+      lower.startsWith('please send') ||
+      lower.startsWith('technovate') ||
+      lower.startsWith('agra,') ||
+      lower.startsWith('brightpath') ||
+      lower.startsWith('noida,')
+    ) {
+      continue;
+    }
 
-    if (match) {
-      const rawQty = match[1] ? parseInt(match[1], 10) : 1;
-      let rawTitle = match[2].trim();
-      const extraNotes = match[3] || match[4] || '';
+    // Pattern A: Numbered/bullet list (e.g. "1. 1 Full-stack...", "- 1 Brand...")
+    const listMatch = line.match(/^(?:[-*•]|\d+[\.\)])\s*(\d+)?\s*(?:x\s*)?([A-Za-z0-9\s/&,.-]+?)(?:\s*\((.*?)\)|$)/i);
+    const hasDotLeader = line.includes('..');
 
-      // Skip non-item headers
+    if (listMatch) {
+      const rawQty = listMatch[1] ? parseInt(listMatch[1], 10) : 1;
+      let rawTitle = listMatch[2].trim();
+      const extraNotes = listMatch[3] || '';
+
       if (
         rawTitle.toLowerCase().startsWith('client details') ||
         rawTitle.toLowerCase().startsWith('scope of work') ||
-        rawTitle.toLowerCase().startsWith('thanks') ||
         rawTitle.length < 3
       ) {
         continue;
       }
 
-      // Check for standalone quantity like "2 REST API Development"
+      // Clean prefix filler
+      rawTitle = rawTitle.replace(/^(?:also\s+please\s+add|please\s+add|also\s+add|add)\s+/i, '');
+
+      // Standalone quantity check
       const qtyStart = rawTitle.match(/^(\d+)\s+(.+)$/);
       let qty = rawQty;
       if (qtyStart) {
@@ -100,22 +231,64 @@ function parseWithRuleEngine(prompt: string): {
         rawTitle = qtyStart[2];
       }
 
-      items.push({
-        title: rawTitle,
-        quantity: Math.max(qty, 1),
-        notes: extraNotes.trim()
-      });
+      // Clean trailing notes/clauses
+      rawTitle = rawTitle
+        .replace(/\s+(?:for\s+our|to\s+integrate|for\s+next|on\s+aws).*$/i, '')
+        .replace(/\s+(?:package|packages|modules?|services?)$/i, '')
+        .trim();
+
+      if (rawTitle.length > 2) {
+        items.push({
+          title: rawTitle,
+          quantity: Math.max(qty, 1),
+          notes: extraNotes.trim()
+        });
+      }
+    } else if (hasDotLeader) {
+      // Pattern B: Dot-leader invoice memo line
+      let clean = line
+        .replace(/^[-*•]\s+/, '')
+        .replace(/^\d+[\.\)]\s+/, '')
+        .replace(/\.{2,}.*$/, '')
+        .replace(/[-_~]{3,}.*$/, '')
+        .replace(/\s+[₹$€£]?\s*[\d,]+(?:\.\d{2})?\s*$/, '')
+        .trim();
+
+      clean = clean.replace(/^(?:we\s+also\s+completed|also\s+completed|completed|we\s+did|added|also\s+please\s+add)\s+/i, '');
+
+      let qty = 1;
+      const wordNums: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6 };
+      const wordQtyMatch = clean.match(/^(one|two|three|four|five|six)\s+(.+)$/i);
+      const numQtyMatch = clean.match(/^(\d+)\s*(?:x\s*)?(.+)$/i);
+
+      if (numQtyMatch) {
+        qty = parseInt(numQtyMatch[1], 10);
+        clean = numQtyMatch[2];
+      } else if (wordQtyMatch) {
+        qty = wordNums[wordQtyMatch[1].toLowerCase()] || 1;
+        clean = wordQtyMatch[2];
+      }
+
+      const trailingQty = clean.match(/^(.+?)\s*-\s*(\d+)\s*(?:sessions|modules|packages|units)?$/i);
+      if (trailingQty) {
+        clean = trailingQty[1];
+        qty = parseInt(trailingQty[2], 10);
+      }
+
+      if (clean.trim().length > 2) {
+        items.push({ title: clean.trim(), quantity: qty });
+      }
     }
   }
 
-  // If list didn't find enough items, check for inline sentence like "We need 1 X and 2 Y"
+  // Fallback inline sentence scanner if items still empty
   if (items.length === 0) {
     const inlineSentence = prompt.match(/(?:need|require|order|want|add|purchase)\s+([^.]+)/i);
     if (inlineSentence && inlineSentence[1]) {
       const segments = inlineSentence[1].split(/(?:,|\band\b|;|\+)/i);
       for (const seg of segments) {
         const trimmedSeg = seg.trim();
-        if (trimmedSeg.length > 3) {
+        if (trimmedSeg.length > 3 && !trimmedSeg.toLowerCase().includes('gst')) {
           const qtyMatch = trimmedSeg.match(/^(\d+)\s+(.+)$/);
           if (qtyMatch) {
             items.push({
@@ -131,20 +304,13 @@ function parseWithRuleEngine(prompt: string): {
         }
       }
     }
+  }
 
-    // Scan for known catalog items mentioned anywhere in text if still empty
-    if (items.length === 0) {
-      for (const catalogItem of CATALOG) {
-        const regex = new RegExp(`(\\d+)?\\s*(?:x\\s*)?${catalogItem.service_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i');
-        const match = prompt.match(regex);
-        if (match) {
-          items.push({
-            title: catalogItem.service_name,
-            quantity: match[1] ? parseInt(match[1], 10) : 1
-          });
-        }
-      }
-    }
+  // Payment terms
+  let terms = 'Payment due within 15 days of invoice date.';
+  const termsMatch = prompt.match(/Payment\s*(?:Terms:?|due:?)\s*([^\n.]+)/i);
+  if (termsMatch && termsMatch[1]) {
+    terms = termsMatch[1].trim();
   }
 
   return {
@@ -153,9 +319,15 @@ function parseWithRuleEngine(prompt: string): {
     companyName: companyName || (clientName !== 'Valued Client' ? `${clientName}'s Company` : 'Client Organization'),
     address: address || 'Corporate Headquarters',
     phone,
+    invoiceNumber,
+    issueDate,
+    senderCompany,
+    senderAddress,
+    senderEmail,
     items,
     taxRate,
-    notes: 'Payment terms: Net 15 days. Please make payment to designated corporate account.'
+    notes: 'Thank you for your business! Bank transfer details will be shared separately.',
+    terms
   };
 }
 
@@ -170,6 +342,8 @@ Return ONLY valid JSON matching this schema:
   "companyName": string,
   "address": string,
   "phone": string,
+  "invoiceNumber": string,
+  "issueDate": string,
   "taxRate": number (e.g. 18 for 18% GST),
   "items": [
     {
@@ -341,16 +515,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Generate Invoice dates & numbers
+    // Generate or use extracted Invoice dates & numbers
     const today = new Date();
     const dueDate = new Date();
     dueDate.setDate(today.getDate() + 15);
 
-    const invoiceNumber = `INV-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const invoiceNumber = extractedData.invoiceNumber || `INV-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const issueDate = extractedData.issueDate || today.toISOString().split('T')[0];
 
     const invoice: InvoiceData = {
       invoiceNumber,
-      issueDate: today.toISOString().split('T')[0],
+      issueDate,
       dueDate: dueDate.toISOString().split('T')[0],
       currency: 'INR',
       currencySymbol: '₹',
@@ -362,11 +537,11 @@ export async function POST(req: NextRequest) {
         phone: extractedData.phone || ''
       },
       sender: {
-        name: 'Accounts Department',
-        company: 'Kodnexus Technologies Pvt. Ltd.',
-        email: 'billing@kodnexus.tech',
+        name: extractedData.senderName || 'Finance & Accounts',
+        company: extractedData.senderCompany || 'Kodnexus Technologies Pvt. Ltd.',
+        email: extractedData.senderEmail || 'billing@kodnexus.tech',
         phone: '+91 (080) 4123-8899',
-        address: 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103',
+        address: extractedData.senderAddress || 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103',
         gstin: '29ABCDE1234F1Z5'
       },
       items: invoiceItems,
@@ -374,7 +549,7 @@ export async function POST(req: NextRequest) {
       taxLabel: 'GST',
       discount: 0,
       notes: extractedData.notes || 'Thank you for your business! Please quote invoice number on bank transfers.',
-      terms: 'Payment is due within 15 days of issue date. Standard 18% GST applicable.'
+      terms: extractedData.terms || 'Payment is due within 15 days of issue date. Standard 18% GST applicable.'
     };
 
     steps.push(`Invoice generation complete. Engine: ${engineUsed}`);
