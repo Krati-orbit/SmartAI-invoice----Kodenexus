@@ -357,61 +357,90 @@ Return ONLY valid JSON matching this schema:
 }
 Do not hallucinate prices. Do not output prices. Output only quantities and titles.`;
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: `${systemInstruction}\n\nClient Input Request:\n${prompt}` }]
-        }
-      ],
-      generationConfig: {
-        responseMimeType: 'application/json'
-      }
-    })
-  });
+  const models = ['gemini-flash-latest', 'gemini-flash-lite-latest', 'gemini-3.8-flash'];
+  let lastError: any = null;
 
-  if (!response.ok) {
-    throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+  for (const model of models) {
+    try {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: `${systemInstruction}\n\nClient Input Request:\n${prompt}` }]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Gemini ${model} error (${response.status}): ${errText}`);
+      }
+
+      const data = await response.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        return { data: JSON.parse(text), modelUsed: model };
+      }
+    } catch (err: any) {
+      lastError = err;
+    }
   }
 
-  const data = await response.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  return JSON.parse(text);
+  throw lastError || new Error('All Gemini model endpoints failed');
 }
 
 // Call Groq API if API key is provided
 async function callGroq(prompt: string, apiKey: string) {
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: 'llama3-70b-8192',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an AI invoice extractor. Extract JSON with clientName, clientEmail, companyName, address, phone, taxRate, and items (title, quantity, description). Output strictly JSON.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      response_format: { type: 'json_object' }
-    })
-  });
+  const models = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'];
+  let lastError: any = null;
 
-  if (!response.ok) {
-    throw new Error(`Groq API error: ${response.status}`);
+  for (const model of models) {
+    try {
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an AI invoice extractor. Extract JSON with clientName, clientEmail, companyName, address, phone, taxRate, and items (title, quantity, description). Output strictly JSON.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          response_format: { type: 'json_object' }
+        })
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Groq ${model} error (${response.status}): ${errText}`);
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content;
+      if (content) {
+        return { data: JSON.parse(content), modelUsed: model };
+      }
+    } catch (err: any) {
+      lastError = err;
+    }
   }
 
-  const data = await response.json();
-  return JSON.parse(data.choices[0].message.content);
+  throw lastError || new Error('All Groq model endpoints failed');
 }
 
 export async function POST(req: NextRequest) {
@@ -441,20 +470,22 @@ export async function POST(req: NextRequest) {
     // 1. Attempt LLM extraction if key available
     if (geminiKey && (provider === 'gemini' || !provider)) {
       try {
-        steps.push('Dispatching prompt to Google Gemini API...');
-        extractedData = await callGemini(prompt, geminiKey);
-        engineUsed = 'Google Gemini 1.5 Flash';
-        steps.push('Gemini extracted entities into structured JSON');
+        steps.push('Dispatching prompt to Google Gemini API (gemini-flash-latest)...');
+        const result = await callGemini(prompt, geminiKey);
+        extractedData = result.data;
+        engineUsed = `Google Gemini Flash (${result.modelUsed})`;
+        steps.push(`Gemini [${result.modelUsed}] extracted entities into structured JSON`);
       } catch (err: any) {
         console.warn('Gemini extraction failed, falling back to rule engine:', err.message);
         steps.push(`Gemini fallback triggered: ${err.message}`);
       }
     } else if (groqKey && provider === 'groq') {
       try {
-        steps.push('Dispatching prompt to Groq (Llama 3)...');
-        extractedData = await callGroq(prompt, groqKey);
-        engineUsed = 'Groq Llama 3';
-        steps.push('Groq extracted structured entities');
+        steps.push('Dispatching prompt to Groq Cloud API...');
+        const result = await callGroq(prompt, groqKey);
+        extractedData = result.data;
+        engineUsed = `Groq Cloud (${result.modelUsed})`;
+        steps.push(`Groq [${result.modelUsed}] extracted structured entities`);
       } catch (err: any) {
         console.warn('Groq extraction failed, falling back to rule engine:', err.message);
         steps.push(`Groq fallback triggered: ${err.message}`);
@@ -523,6 +554,14 @@ export async function POST(req: NextRequest) {
     const invoiceNumber = extractedData.invoiceNumber || `INV-${today.getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const issueDate = extractedData.issueDate || today.toISOString().split('T')[0];
 
+    let finalTaxRate = extractedData.taxRate !== undefined && extractedData.taxRate !== null ? Number(extractedData.taxRate) : 18;
+    if (finalTaxRate > 0 && finalTaxRate <= 1) {
+      finalTaxRate = Math.round(finalTaxRate * 100);
+    }
+    if (isNaN(finalTaxRate) || finalTaxRate < 0) {
+      finalTaxRate = 18;
+    }
+
     const invoice: InvoiceData = {
       invoiceNumber,
       issueDate,
@@ -545,7 +584,7 @@ export async function POST(req: NextRequest) {
         gstin: '29ABCDE1234F1Z5'
       },
       items: invoiceItems,
-      taxRate: extractedData.taxRate || 18,
+      taxRate: finalTaxRate,
       taxLabel: 'GST',
       discount: 0,
       notes: extractedData.notes || 'Thank you for your business! Please quote invoice number on bank transfers.',
