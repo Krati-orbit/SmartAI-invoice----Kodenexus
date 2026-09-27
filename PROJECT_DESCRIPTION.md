@@ -1,7 +1,7 @@
-# Project Description: Kodnexus SmartInvoice
+# Project Description: SmartInvoice AI
 
 **Short Pitch (150 words):**
-Kodnexus SmartInvoice is an intelligent invoice automation tool engineered to transform messy, unstructured customer requests—such as emails, Slack chats, and requirement briefs—into structured, priced, and review-ready professional invoices within milliseconds. 
+SmartInvoice AI is an intelligent invoice automation tool engineered to transform messy, unstructured customer requests—such as emails, Slack chats, and requirement briefs—into structured, priced, and review-ready professional invoices within milliseconds. 
 
 Unlike conventional AI tools that hallucinate rates, SmartInvoice features a strict **Anti-Hallucination Pricing Engine** backed by an authoritative benchmark catalog of 15 services. Line items are accurately matched against official rates, while unrecognized custom requests trigger **Smart Fallback Alerts** for operator review. 
 

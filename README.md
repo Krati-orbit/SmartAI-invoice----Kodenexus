@@ -1,11 +1,11 @@
-# ⚡ Kodnexus SmartInvoice – AI-Powered Invoice Automation
+# ⚡ SmartInvoice AI – Intelligent Invoice Automation Platform
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![Anti-Hallucination Safe](https://img.shields.io/badge/Anti--Hallucination-100%25_Verified-10b981)](#-anti-hallucination-pricing-architecture)
 
-> **Kodnexus AI Build Battle – Smart Invoice Challenge**  
+> **Enterprise AI Invoicing Platform**  
 > An intelligent invoice automation web application that transforms unstructured natural language customer requests into structured, priced, and review-ready professional invoices within milliseconds.
 
 ---
@@ -14,7 +14,7 @@
 
 Freelancers, agencies, and tech vendors lose dozens of hours manually deciphering client emails, briefs, and chat messages into billable invoices. Traditional LLM-based tools frequently **hallucinate pricing** or format line items incorrectly.
 
-**Kodnexus SmartInvoice** solves this with a **Dual-Engine Architecture**:
+**SmartInvoice AI** solves this with a **Dual-Engine Architecture**:
 1. **AI / NLP Extraction Layer**: Extracts client names, contact details, requested services, quantities, and terms from raw unstructured text.
 2. **Anti-Hallucination Pricing Catalog**: Strictly cross-references extracted services against an authoritative benchmark pricing catalog (`mock_data`), preventing AI price hallucinations.
 3. **Human-in-the-Loop Review Dashboard**: Allows operators to review, edit quantities, tweak rates, configure GST/tax brackets, and resolve unmatched custom services before producing a pixel-perfect PDF.
@@ -99,8 +99,8 @@ flowchart TD
 
 ### 1. Clone Repository & Install Dependencies
 ```bash
-git clone https://github.com/your-username/kodnexus-smart-invoice.git
-cd kodnexus-smart-invoice
+git clone https://github.com/Krati-orbit/SmartAI-invoice----Kodenexus.git
+cd SmartAI-invoice----Kodenexus
 npm install
 ```
 
