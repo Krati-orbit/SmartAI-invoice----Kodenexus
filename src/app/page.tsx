@@ -18,8 +18,8 @@ import { ShieldCheck, Zap, Database } from 'lucide-react';
 
 const INITIAL_SENDER: SenderInfo = {
   name: 'Finance & Accounts',
-  company: 'Kodnexus Technologies Pvt. Ltd.',
-  email: 'billing@kodnexus.tech',
+  company: 'SmartInvoice Technologies Pvt. Ltd.',
+  email: 'billing@smartinvoice.ai',
   phone: '+91 (080) 4123-8899',
   address: 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103',
   gstin: '29ABCDE1234F1Z5'
@@ -298,7 +298,7 @@ export default function Home() {
 
       const newInvoice: InvoiceData = {
         ...data.invoice,
-        sender: data.invoice.sender?.company && data.invoice.sender.company !== 'Kodnexus Technologies Pvt. Ltd.'
+        sender: data.invoice.sender?.company && data.invoice.sender.company !== 'SmartInvoice Technologies Pvt. Ltd.'
           ? data.invoice.sender
           : senderProfile
       };
@@ -386,7 +386,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#0b0f19] text-slate-100 flex flex-col font-sans selection:bg-indigo-500/30 selection:text-white">
       {/* Top Header */}
       <Header
         onOpenSideDrawer={() => setIsSideDrawerOpen(true)}
@@ -399,10 +399,10 @@ export default function Home() {
       />
 
       {/* Hero Stats Ribbon */}
-      <div className="border-b border-slate-900 bg-slate-950/60 backdrop-blur-md">
+      <div className="border-b border-slate-800/60 bg-[#0d1322]/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap items-center justify-between gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="flex h-2 w-2 rounded-full bg-emerald-400/90 animate-pulse" />
             <span className="font-semibold text-slate-300">Live AI Engine Active:</span>
             <span className="text-slate-400">
               Transforming unstructured requests into review-ready invoices
@@ -411,16 +411,16 @@ export default function Home() {
 
           <div className="flex items-center gap-4 sm:gap-6 text-slate-400">
             <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Anti-Hallucination: <strong className="text-emerald-400">100%</strong></span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400/90" />
+              <span>Anti-Hallucination: <strong className="text-emerald-400 font-semibold">100%</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Database className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Catalog: <strong className="text-indigo-400">{CATALOG.length} Services</strong></span>
+              <Database className="w-3.5 h-3.5 text-indigo-400/90" />
+              <span>Catalog: <strong className="text-indigo-400 font-semibold">{CATALOG.length} Services</strong></span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>Avg Latency: <strong className="text-amber-400">~150ms</strong></span>
+              <Zap className="w-3.5 h-3.5 text-amber-400/90" />
+              <span>Avg Latency: <strong className="text-amber-400 font-semibold">~150ms</strong></span>
             </div>
           </div>
         </div>
@@ -432,8 +432,8 @@ export default function Home() {
       {/* Floating Success Toast */}
       {showSuccessToast && (
         <div className="fixed top-20 right-4 sm:right-8 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-900 border border-emerald-500/60 shadow-2xl shadow-emerald-500/25 text-white max-w-sm sm:max-w-md">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-500/30">
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-900/95 border border-emerald-500/40 shadow-xl shadow-emerald-500/10 text-white max-w-sm sm:max-w-md backdrop-blur-md">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-lg shrink-0 border border-emerald-500/25">
               ✓
             </div>
             <div className="flex-1 min-w-0">

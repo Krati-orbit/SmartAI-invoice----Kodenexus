@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Kodnexus SmartInvoice – AI-Powered Invoice Automation',
+  title: 'SmartInvoice AI – Intelligent Invoice Automation Platform',
   description: 'Transform messy unstructured client requests into structured, priced, and review-ready professional invoices with anti-hallucination catalog lookups.',
-  keywords: ['invoice automation', 'smart invoice', 'ai invoice', 'kodnexus build battle', 'anti-hallucination pricing']
+  keywords: ['invoice automation', 'smart invoice', 'ai invoice', 'anti-hallucination pricing', 'invoicing platform']
 };
 
 export default function RootLayout({
@@ -28,7 +28,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+      <body className="min-h-full flex flex-col bg-[#0b0f19] text-slate-100 selection:bg-indigo-500/30 selection:text-white">
         {children}
       </body>
     </html>

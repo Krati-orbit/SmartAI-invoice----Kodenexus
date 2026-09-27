@@ -127,16 +127,16 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
   const unmatchedCount = invoice.items.filter(i => i.isUnmatched).length;
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/80 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md">
+    <div className="flex flex-col h-full bg-[#0d1322]/80 border border-slate-800/60 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md">
       {/* Top Action & Verification Bar */}
-      <div className="p-4 border-b border-slate-800 bg-slate-950/80 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-4 border-b border-slate-800/60 bg-[#0b0f19]/90 flex flex-wrap items-center justify-between gap-3">
         {/* Step Badge & Section Title */}
         <div className="flex items-center gap-2.5">
-          <span className="px-2.5 py-1 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+          <span className="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 text-[10px] font-bold uppercase tracking-wider">
             Step 3 of 3
           </span>
           <div>
-            <h2 className="text-sm font-black text-white uppercase tracking-wide flex items-center gap-2">
+            <h2 className="text-sm font-bold text-white uppercase tracking-wide flex items-center gap-2">
               Review, Finalize & Export PDF
             </h2>
             <p className="text-[11px] text-slate-400">
@@ -148,15 +148,15 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
         {/* Currency & Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Currency Switcher */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-0.5 text-xs">
+          <div className="flex items-center bg-slate-900/90 border border-slate-800/80 rounded-xl p-0.5 text-xs">
             {(['INR', 'USD', 'EUR', 'GBP'] as const).map(c => (
               <button
                 key={c}
                 type="button"
                 onClick={() => setCurrency(c)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
+                className={`px-2 py-1 rounded-lg text-[10px] font-semibold transition-all cursor-pointer ${
                   currency === c
-                    ? 'bg-indigo-600 text-white shadow-sm'
+                    ? 'bg-indigo-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -169,7 +169,7 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
           <button
             onClick={onOpenAddItem}
             type="button"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-200 border border-slate-700/80 text-xs font-semibold transition-all hover:scale-102 active:scale-98 cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-indigo-400" />
             <span>Add Item</span>
@@ -179,7 +179,7 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
           <button
             onClick={handlePrint}
             type="button"
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer"
+            className="p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700/90 text-slate-300 border border-slate-700/80 transition-colors cursor-pointer"
             title="Print or Save via Browser"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
             onClick={handleDownloadPDF}
             disabled={isExporting}
             type="button"
-            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black shadow-md shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer uppercase tracking-wider"
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 transition-all hover:scale-102 active:scale-98 cursor-pointer tracking-wider"
           >
             {isExporting ? (
               <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -204,31 +204,31 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
 
       {/* Unmatched Alert Banner (if any) */}
       {unmatchedCount > 0 && (
-        <div className="px-5 py-3 bg-amber-500/15 border-b border-amber-500/30 flex items-center justify-between text-xs text-amber-200">
+        <div className="px-5 py-3 bg-amber-500/10 border-b border-amber-500/20 flex items-center justify-between text-xs text-amber-200">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
               <strong>Smart Fallback Triggered:</strong> {unmatchedCount} bespoke service(s) flagged. Please review and input a rate or map to an official catalog item.
             </span>
           </div>
-          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
+          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
             Action Required
           </span>
         </div>
       )}
 
       {/* Main Scrollable Canvas: The Invoice Paper Document */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-950/60">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#090d16]/80">
         <div
           id="invoice-paper-document"
-          className="max-w-3xl mx-auto bg-white text-slate-900 rounded-2xl shadow-2xl p-6 sm:p-10 border border-slate-200 space-y-7 print:p-0 print:border-none print:shadow-none print:text-black"
+          className="max-w-3xl mx-auto bg-white text-slate-800 rounded-2xl shadow-xl shadow-black/25 p-6 sm:p-10 border border-slate-200/80 space-y-7 print:p-0 print:border-none print:shadow-none print:text-black"
         >
           {/* Invoice Document Header */}
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-6 border-b-2 border-slate-100">
             <div>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-xl shadow-md shadow-indigo-600/30">
-                  K
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-700 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-indigo-600/25">
+                  {invoice.sender?.company?.trim()?.charAt(0) || 'S'}
                 </div>
                 <div>
                   <h1 className="text-xl font-black tracking-tight text-slate-900 leading-tight">
@@ -669,7 +669,7 @@ export const InvoiceReviewPanel: React.FC<InvoiceReviewPanelProps> = ({
           {/* Footer Signature */}
           <div className="pt-6 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
             <div>
-              Generated via <strong>Kodnexus SmartInvoice Engine</strong>
+              Generated via <strong>SmartInvoice AI Engine</strong>
             </div>
             <div className="flex items-center gap-1.5 text-emerald-600 font-bold">
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />

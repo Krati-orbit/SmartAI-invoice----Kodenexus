@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 
 export async function exportInvoiceToPDF(elementId: string, invoiceNumber: string): Promise<boolean> {
   const element = document.getElementById(elementId);

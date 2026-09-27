@@ -110,7 +110,7 @@ function parseWithRuleEngine(prompt: string): {
   }
 
   // Extract Sender Organization (e.g., TECHNOVATE SOLUTIONS, Agra)
-  let senderCompany = 'Kodnexus Technologies Pvt. Ltd.';
+  let senderCompany = 'SmartInvoice Technologies Pvt. Ltd.';
   let senderAddress = 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103';
 
   const headerSenderMatch = prompt.match(/^\s*([A-Z\s]{4,35})\n+\s*([^\n]+)\n+\s*([^\n]+)/);
@@ -577,8 +577,8 @@ export async function POST(req: NextRequest) {
       },
       sender: {
         name: extractedData.senderName || 'Finance & Accounts',
-        company: extractedData.senderCompany || 'Kodnexus Technologies Pvt. Ltd.',
-        email: extractedData.senderEmail || 'billing@kodnexus.tech',
+        company: extractedData.senderCompany || 'SmartInvoice Technologies Pvt. Ltd.',
+        email: extractedData.senderEmail || 'billing@smartinvoice.ai',
         phone: '+91 (080) 4123-8899',
         address: extractedData.senderAddress || 'Tower B, Tech Innovation Park, Outer Ring Road, Bengaluru, KA 560103',
         gstin: '29ABCDE1234F1Z5'

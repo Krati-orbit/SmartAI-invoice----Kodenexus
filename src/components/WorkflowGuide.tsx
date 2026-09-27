@@ -37,9 +37,9 @@ export const WorkflowGuide: React.FC = () => {
       subtitle: 'Raw Message or 1-Click Preset',
       desc: 'Select a sample scenario from the left panel, or paste any raw email or chat request.',
       tag: 'Step 1: Input',
-      accentBorder: 'border-indigo-500/40 hover:border-indigo-400',
-      badgeBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
-      numBg: 'bg-indigo-600 text-white shadow-indigo-600/30'
+      accentBorder: 'border-indigo-500/30 hover:border-indigo-500/50',
+      badgeBg: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/25',
+      numBg: 'bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white shadow-sm shadow-indigo-500/20'
     },
     {
       num: '02',
@@ -47,9 +47,9 @@ export const WorkflowGuide: React.FC = () => {
       subtitle: 'Anti-Hallucination Engine',
       desc: 'Click "Generate Structured Invoice". Entities are parsed and locked strictly to catalog prices.',
       tag: 'Step 2: Match',
-      accentBorder: 'border-violet-500/40 hover:border-violet-400',
-      badgeBg: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
-      numBg: 'bg-violet-600 text-white shadow-violet-600/30'
+      accentBorder: 'border-violet-500/30 hover:border-violet-500/50',
+      badgeBg: 'bg-violet-500/15 text-violet-300 border-violet-500/25',
+      numBg: 'bg-gradient-to-tr from-violet-600 to-purple-500 text-white shadow-sm shadow-violet-500/20'
     },
     {
       num: '03',
@@ -57,15 +57,15 @@ export const WorkflowGuide: React.FC = () => {
       subtitle: 'Human-in-the-Loop + PDF',
       desc: 'Tweak quantities or rates, select GST bracket (0-28%), and download the professional PDF.',
       tag: 'Step 3: Export',
-      accentBorder: 'border-emerald-500/40 hover:border-emerald-400',
-      badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-      numBg: 'bg-emerald-600 text-white shadow-emerald-600/30'
+      accentBorder: 'border-emerald-500/30 hover:border-emerald-500/50',
+      badgeBg: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/25',
+      numBg: 'bg-gradient-to-tr from-emerald-600 to-teal-500 text-white shadow-sm shadow-emerald-500/20'
     }
   ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-      <div className="relative rounded-2xl bg-slate-900/90 border border-slate-800 p-4 sm:p-5 backdrop-blur-xl shadow-xl">
+      <div className="relative rounded-2xl bg-[#0d1322]/80 border border-slate-800/60 p-4 sm:p-5 backdrop-blur-xl shadow-xl">
         {/* Close Button */}
         <button
           onClick={() => setIsOpen(false)}
@@ -76,11 +76,11 @@ export const WorkflowGuide: React.FC = () => {
         </button>
 
         {/* Section Header with clear typography */}
-        <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-800/80">
+        <div className="flex items-center gap-2 mb-3.5 pb-2.5 border-b border-slate-800/60">
           <div className="h-6 w-6 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
             <Sparkles className="w-3.5 h-3.5" />
           </div>
-          <h2 className="text-xs font-black tracking-wide text-white uppercase">
+          <h2 className="text-xs font-bold tracking-wide text-white uppercase">
             How The Application Works: 3-Step Guided Workflow
           </h2>
           <span className="text-[11px] text-slate-400 hidden sm:inline ml-auto pr-8">
@@ -93,10 +93,10 @@ export const WorkflowGuide: React.FC = () => {
           {steps.map((st) => (
             <div
               key={st.num}
-              className={`relative flex items-start gap-3.5 p-3.5 rounded-xl bg-slate-950/70 border ${st.accentBorder} transition-all shadow-sm`}
+              className={`relative flex items-start gap-3.5 p-3.5 rounded-xl bg-[#090d16]/75 border ${st.accentBorder} transition-all shadow-xs`}
             >
               <div
-                className={`w-8 h-8 rounded-xl flex items-center justify-center font-black text-xs shrink-0 shadow-md ${st.numBg}`}
+                className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 shadow-sm ${st.numBg}`}
               >
                 {st.num}
               </div>
@@ -106,11 +106,11 @@ export const WorkflowGuide: React.FC = () => {
                   <h3 className="text-xs font-bold text-white tracking-tight">
                     {st.title}
                   </h3>
-                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider shrink-0 ${st.badgeBg}`}>
+                  <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded border uppercase tracking-wider shrink-0 ${st.badgeBg}`}>
                     {st.tag}
                   </span>
                 </div>
-                <div className="text-[10px] font-semibold text-slate-400">
+                <div className="text-[10px] font-medium text-slate-400">
                   {st.subtitle}
                 </div>
                 <p className="text-[11px] text-slate-400 leading-relaxed pt-0.5">
