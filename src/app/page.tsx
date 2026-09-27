@@ -11,6 +11,7 @@ import { CompanyModal } from '@/components/CompanyModal';
 import { SettingsModal } from '@/components/SettingsModal';
 import { AddItemModal } from '@/components/AddItemModal';
 import { WorkflowGuide } from '@/components/WorkflowGuide';
+import { InvoiceChatbot } from '@/components/InvoiceChatbot';
 import { InvoiceData, InvoiceItem, SenderInfo } from '@/types/invoice';
 import { SAMPLE_PRESETS } from '@/data/presets';
 import { CATALOG, CatalogItem } from '@/data/catalog';
@@ -214,6 +215,7 @@ export default function Home() {
   const [isCompanyOpen, setIsCompanyOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddItemOpen, setIsAddItemOpen] = useState(false);
+  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
 
   // Settings
   const [apiKey, setApiKey] = useState('');
@@ -383,6 +385,7 @@ export default function Home() {
     else if (view === 'catalog') setIsCatalogOpen(true);
     else if (view === 'company') setIsCompanyOpen(true);
     else if (view === 'settings') setIsSettingsOpen(true);
+    else if (view === 'chat') setIsChatbotOpen(true);
   };
 
   return (
@@ -394,6 +397,7 @@ export default function Home() {
         onOpenHistory={() => setIsHistoryOpen(true)}
         onOpenCompany={() => setIsCompanyOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenChatbot={() => setIsChatbotOpen(prev => !prev)}
         activeProvider={provider === 'smart' ? 'Built-in NLP' : provider}
         historyCount={historyInvoices.length}
       />
@@ -537,6 +541,14 @@ export default function Home() {
         isOpen={isAddItemOpen}
         onClose={() => setIsAddItemOpen(false)}
         onAddItem={handleAddItem}
+      />
+
+      {/* Interactive AI Invoice Chatbot Co-Pilot */}
+      <InvoiceChatbot
+        invoice={invoice}
+        apiKey={apiKey}
+        isOpenExternal={isChatbotOpen}
+        onCloseExternal={() => setIsChatbotOpen(false)}
       />
     </div>
   );

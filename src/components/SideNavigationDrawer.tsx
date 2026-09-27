@@ -11,10 +11,11 @@ import {
   ChevronRight,
   ShieldCheck,
   Zap,
-  ExternalLink
+  ExternalLink,
+  Bot
 } from 'lucide-react';
 
-export type ActiveModal = 'history' | 'catalog' | 'company' | 'settings' | null;
+export type ActiveModal = 'history' | 'catalog' | 'company' | 'settings' | 'chat' | null;
 
 interface SideNavigationDrawerProps {
   isOpen: boolean;
@@ -73,6 +74,14 @@ export const SideNavigationDrawer: React.FC<SideNavigationDrawerProps> = ({
       icon: Settings,
       badge: 'AI Config',
       badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20'
+    },
+    {
+      id: 'chat' as ActiveModal,
+      title: 'Invoice AI Assistant',
+      desc: 'Interactive chatbot to ask multiple questions about this invoice (Gemini)',
+      icon: Bot,
+      badge: 'Gemini Chat',
+      badgeColor: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
     }
   ];
 

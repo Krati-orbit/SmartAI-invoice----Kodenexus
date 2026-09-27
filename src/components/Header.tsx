@@ -9,6 +9,7 @@ interface HeaderProps {
   onOpenHistory: () => void;
   onOpenCompany: () => void;
   onOpenSettings: () => void;
+  onOpenChatbot?: () => void;
   activeProvider: string;
   historyCount: number;
 }
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenHistory,
   onOpenCompany,
   onOpenSettings,
+  onOpenChatbot,
   activeProvider,
   historyCount
 }) => {
@@ -114,6 +116,19 @@ export const Header: React.FC<HeaderProps> = ({
             <Settings className="w-3.5 h-3.5 text-slate-400 hover:text-white" />
             <span className="hidden xl:inline">AI Settings</span>
           </button>
+
+          {/* AI Chatbot Assistant Trigger */}
+          {onOpenChatbot && (
+            <button
+              onClick={onOpenChatbot}
+              type="button"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-500/15 via-violet-500/15 to-indigo-500/15 hover:from-indigo-500/25 hover:to-violet-500/25 border border-indigo-500/35 text-xs font-semibold text-indigo-300 transition-all hover:scale-102 active:scale-98 cursor-pointer shadow-xs"
+              title="Open Gemini Invoice AI Chatbot"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+              <span>Ask AI</span>
+            </button>
+          )}
 
           {/* Anti-Hallucination Safe Badge */}
           <div className="hidden xl:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-950/40 border border-emerald-500/25 text-[11px] font-medium text-emerald-400">
